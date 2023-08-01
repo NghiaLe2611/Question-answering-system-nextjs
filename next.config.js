@@ -14,6 +14,9 @@ const nextConfig = {
     // Make ENV
     unoptimized: true,
   },
+  env: {
+    API_URL: 'http://192.168.6.145:5000',
+  },
 };
 
 module.exports = nextConfig;

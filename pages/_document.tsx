@@ -4,9 +4,8 @@ import Script from 'next/script';
 export default function Document() {
   return (
     <Html lang="en">
-      <Head>
-        <title>Question Answering System</title>
-      </Head>
+      <Head />
+      {/* <title>Question Answering System</title> */}
       <body suppressHydrationWarning={true}>
         <Main />
         <NextScript />

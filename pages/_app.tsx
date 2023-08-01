@@ -57,6 +57,7 @@ function App({ Component, pageProps }: AppProps<{}>) {
           </Portal>
           <Box
             mx="auto"
+            display='flex'
             p={{ base: '20px', md: '30px' }}
             pe="20px"
             minH="100vh"
