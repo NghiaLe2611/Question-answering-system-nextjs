@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const uploadFileAPI = async (filePath: string): Promise<string> => {
   try {
-    const response = await axios.post('http://localhost:5000/upload-file', {
+    const response = await axios.post(`${process.env.API_URL}/upload-file`, {
       file: filePath, 
     });
 

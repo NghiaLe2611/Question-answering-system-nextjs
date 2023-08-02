@@ -37,7 +37,7 @@ const UploadButton: React.FC = () => {
       formData.append('file', selectedFile);
 
       try {
-        const response = await fetch('http://127.0.0.1:5000/upload-file', {
+        const response = await fetch(`${process.env.API_URL}/upload-file`, {
           method: 'POST',
           body: formData,
         });

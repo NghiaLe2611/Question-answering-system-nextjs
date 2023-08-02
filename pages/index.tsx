@@ -4,13 +4,14 @@
 import Link from '@/components/link/Link';
 import MessageBoxChat from '@/components/MessageBox';
 import { ChatBody, OpenAIModel } from '@/types/types';
-import { Button, Flex, Icon, Img, Input, Text, useColorModeValue } from '@chakra-ui/react';
+import { Button, Flex, Icon, Img, Input, Text, Tooltip, useColorModeValue } from '@chakra-ui/react';
 import { memo, useState } from 'react';
-import { MdAutoAwesome, MdEdit, MdPerson } from 'react-icons/md';
+import { MdAutoAwesome, MdEdit, MdPerson, MdSend } from 'react-icons/md';
 import Bg from '../public/img/chat/bg-image.png';
 import axios from 'axios';
+import Head from 'next/head';
 
-const BoxItem = memo(({ question, answer }: { question: string; answer: string }) => {
+const BoxItem = memo(({ question, answer }: { question: string; answer: string; }) => {
     const borderColor = useColorModeValue('gray.200', 'whiteAlpha.200');
     const brandColor = useColorModeValue('brand.500', 'white');
     const gray = useColorModeValue('gray.500', 'white');
@@ -27,7 +28,7 @@ const BoxItem = memo(({ question, answer }: { question: string; answer: string }
             mx="auto"
             display={isDisplay ? 'flex' : 'none'}
             mb="50px"
-            // mb={'auto'}
+        // mb={'auto'}
         >
             {/* Question */}
             <Flex w="100%" align={'center'} mb="10px">
@@ -79,7 +80,7 @@ const BoxItem = memo(({ question, answer }: { question: string; answer: string }
     );
 });
 
-export default function Chat(props: { apiKeyApp: string }) {
+export default function Chat(props: { apiKeyApp: string; }) {
     // *** If you use .env.local variable for your API key, method which we recommend, use the apiKey variable commented below
     const { apiKeyApp } = props;
     // Input States
@@ -121,7 +122,7 @@ export default function Chat(props: { apiKeyApp: string }) {
             return newData;
         });
     };
-    
+
     // const handleSetData = (res: any) => {
     //     const question = res.question ? res.question : '';
     //     const answer = res.answer ? res.answer : '';
@@ -139,7 +140,7 @@ export default function Chat(props: { apiKeyApp: string }) {
     //         setData((prevData) => [...prevData, { question, answer }]);
     //     }
     // };
-      
+
     // const handleTranslate = async () => {
     //     const apiKey = apiKeyApp;
 
@@ -191,7 +192,7 @@ export default function Chat(props: { apiKeyApp: string }) {
         // setInputOnSubmit(inputCode);
         handleSetData({
             question: inputCode
-        })
+        });
 
         // Chat post conditions(maximum number of characters, valid message etc.)
         const maxCodeLength = model === 'gpt-3.5-turbo' ? 700 : 700;
@@ -253,46 +254,50 @@ export default function Chat(props: { apiKeyApp: string }) {
     };
 
     return (
-        <Flex w="100%" pt={{ base: '70px', md: '0px' }} direction="column" position="relative">
-            <Img src={Bg.src} position={'absolute'} w="0px" left="50%" top="50%" transform={'translate(-50%, -50%)'} />
-            <Flex
-                direction="column"
-                mx="auto"
-                w={{ base: '100%', md: '100%', xl: '100%' }}
-                minH={{ base: '75vh', '2xl': '85vh' }}
-                maxW="1000px"
-            >
-                {/* <Flex direction={'column'} w="100%" mb={outputCode ? '20px' : 'auto'}>
+        <>
+            <Head>
+                <title>Question Answering System</title>
+            </Head>
+            <Flex w="100%" pt={{ base: '70px', md: '0px' }} direction="column" position="relative">
+                <Img src={Bg.src} position={'absolute'} w="0px" left="50%" top="50%" transform={'translate(-50%, -50%)'} />
+                <Flex
+                    direction="column"
+                    mx="auto"
+                    w={{ base: '100%', md: '100%', xl: '100%' }}
+                    minH={{ base: '75vh', '2xl': '85vh' }}
+                    maxW="1000px"
+                >
+                    {/* <Flex direction={'column'} w="100%" mb={outputCode ? '20px' : 'auto'}>
                     <Flex mx="auto" zIndex="2" w="max-content" mb="20px" borderRadius="60px"></Flex>
                 </Flex> */}
 
-                {/* Main Box */}
-                {data.length > 0 &&
-                    data.map((item: any, index) => (
-                        <BoxItem key={index + `${item.question}`} question={item.question} answer={item.answer} />
-                    ))}
+                    {/* Main Box */}
+                    {data.length > 0 &&
+                        data.map((item: any, index) => (
+                            <BoxItem key={index + `${item.question}`} question={item.question} answer={item.answer} />
+                        ))}
 
-                {/* Chat Input */}
-                <Flex ms={{ base: '0px', xl: '60px' }} mt="auto" justifySelf={'flex-end'}>
-                    <Input
-                        minH="54px"
-                        h="100%"
-                        border="1px solid"
-                        borderColor={borderColor}
-                        borderRadius="45px"
-                        p="15px 20px"
-                        me="10px"
-                        fontSize="sm"
-                        fontWeight="500"
-                        _focus={{ borderColor: 'none' }}
-                        color={inputColor}
-                        _placeholder={placeholderColor}
-                        placeholder="Type your message here..."
-                        value={inputCode}
-                        onChange={handleChange}
-                        onKeyDown={handleKeyDown}
-                    />
-                    <Button
+                    {/* Chat Input */}
+                    <Flex ms={{ base: '0px', xl: '60px' }} mt="auto" justifySelf={'flex-end'}>
+                        <Input
+                            minH="54px"
+                            h="100%"
+                            border="1px solid"
+                            borderColor={borderColor}
+                            borderRadius="45px"
+                            p="15px 20px"
+                            me="10px"
+                            fontSize="sm"
+                            fontWeight="500"
+                            _focus={{ borderColor: 'none' }}
+                            color={inputColor}
+                            _placeholder={placeholderColor}
+                            placeholder="Type your message here..."
+                            value={inputCode}
+                            onChange={handleChange}
+                            onKeyDown={handleKeyDown}
+                        />
+                        {/* <Button
                         variant="primary"
                         py="20px"
                         px="16px"
@@ -312,21 +317,34 @@ export default function Chat(props: { apiKeyApp: string }) {
                         isLoading={loading ? true : false}
                     >
                         Ask
-                    </Button>
-                </Flex>
+                    </Button> */}
+                        <Tooltip label="Send a message">
+                            <Button py="20px"
+                                fontSize="sm"
+                                ms="auto"
+                                _hover={{ backgroundColor: "transparent", boxShadow: "none" }}
+                                _active={{ backgroundColor: "transparent", boxShadow: "none" }}
+                                h="54px" onClick={handleTranslate} disabled={loading ? true : false}>
+                                <Icon as={MdSend} width="20px" height="20px" color={brandColor} />
+                            </Button>
+                        </Tooltip>
 
-                <Flex justify="center" mt="20px" direction={{ base: 'column', md: 'row' }} alignItems="center">
-                    <Text fontSize="xs" textAlign="center" color={gray}>
-                        Free Research Preview. ChatGPT may produce inaccurate information about people, places, or
-                        facts.
-                    </Text>
-                    <Link href="https://help.openai.com/en/articles/6825453-chatgpt-release-notes">
-                        <Text fontSize="xs" color={textColor} fontWeight="500" textDecoration="underline">
-                            ChatGPT May 12 Version
+                    </Flex>
+
+                    <Flex justify="center" mt="20px" direction={{ base: 'column', md: 'row' }} alignItems="center">
+                        <Text fontSize="xs" textAlign="center" color={gray}>
+                            Free Research Preview. ChatGPT may produce inaccurate information about people, places, or
+                            facts.
                         </Text>
-                    </Link>
+                        <Link href="https://help.openai.com/en/articles/6825453-chatgpt-release-notes">
+                            <Text fontSize="xs" color={textColor} fontWeight="500" textDecoration="underline">
+                                ChatGPT May 12 Version
+                            </Text>
+                        </Link>
+                    </Flex>
                 </Flex>
             </Flex>
-        </Flex>
+        </>
+
     );
 }

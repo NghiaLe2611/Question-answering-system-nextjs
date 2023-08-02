@@ -15,7 +15,8 @@ const nextConfig = {
     unoptimized: true,
   },
   env: {
-    API_URL: 'http://192.168.6.145:5000',
+    // API_URL: 'http://192.168.6.145:5000',
+    API_URL: 'http://127.0.0.1:5000',
   },
 };
 
