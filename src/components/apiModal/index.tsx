@@ -49,22 +49,25 @@ function APIModal(props: { setApiKey: any; sidebar?: boolean; }) {
     };
 
     const handleApiKeyChange = (value: string) => {
-        setApiKey(value);
-        localStorage.setItem('apiKey', value);
-        axios.post(`/api/setApi-key.API`, { apiKey: value }).then((response) => { // '/api-key'
+        // setApiKey(value);
+        axios.post(`${process.env.API_URL}/api-key`, { apiKey: value }).then((response) => { // '/api-key'
             if (response.status === 200) {
+                localStorage.setItem('apiKey', value);
                 toast({
-                    title: 'Success! You have successfully added your API key!',
+                    title: response.data || 'Success! You have successfully added your API key!',
                     position: 'top',
                     status: 'success',
                     isClosable: true,
+                    duration: 2000
                 });
+                onClose(); // close popup after success
             } else {
                 toast({
                     title: 'API key not found',
                     position: 'top',
                     status: 'error',
                     isClosable: true,
+                    duration: 2000
                 });
             }
         });
@@ -156,23 +159,23 @@ function APIModal(props: { setApiKey: any; sidebar?: boolean; }) {
                                         inputCode?.includes('sk-')
                                             ? handleApiKeyChange(inputCode)
                                             : null;
-                                        if (inputCode)
-                                            toast({
-                                                title: inputCode?.includes('sk-')
-                                                    ? `Success! You have successfully added your API key!`
-                                                    : !inputCode?.includes('sk-')
-                                                        ? `Invalid API key. Please make sure your API key is still working properly.`
-                                                        : 'Please add your API key!',
-                                                position: 'top',
-                                                status: inputCode?.includes('sk-')
-                                                    ? 'success'
-                                                    : !inputCode?.includes('sk-')
-                                                        ? `error`
-                                                        : !inputCode
-                                                            ? 'warning'
-                                                            : 'error',
-                                                isClosable: true,
-                                            });
+                                        // if (inputCode)
+                                        //     toast({
+                                        //         title: inputCode?.includes('sk-')
+                                        //             ? `Success! You have successfully added your API key!`
+                                        //             : !inputCode?.includes('sk-')
+                                        //                 ? `Invalid API key. Please make sure your API key is still working properly.`
+                                        //                 : 'Please add your API key!',
+                                        //         position: 'top',
+                                        //         status: inputCode?.includes('sk-')
+                                        //             ? 'success'
+                                        //             : !inputCode?.includes('sk-')
+                                        //                 ? `error`
+                                        //                 : !inputCode
+                                        //                     ? 'warning'
+                                        //                     : 'error',
+                                        //         isClosable: true,
+                                        //     });
                                     }}
                                 >
                                     Save API Key

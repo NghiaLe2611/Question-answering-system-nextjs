@@ -84,7 +84,7 @@ function SidebarContent(props: SidebarContent) {
       >
         <NextAvatar h="34px" w="34px" src={avatar4} me="10px" />
         <Text color={textColor} fontSize="xs" fontWeight="600" me="10px">
-          Adela Parkson
+          Ta Thi Yen Nhi
         </Text>
         <Menu>
           <MenuButton
