@@ -36,7 +36,7 @@ const BoxItem = memo(({ question, answer }: { question: string; answer: string }
     const textColor = useColorModeValue('navy.700', 'white');
 
     const isDisplay = question && question !== '' && answer && answer !== '';
-    console.log('BoxItem', question, answer);
+    // console.log('BoxItem', question, answer);
 
     return (
         <Flex
@@ -151,8 +151,6 @@ function Chat() {
     };
 
     const handleTranslate = async () => {
-        const apiKey = apiKey;
-
         // setInputOnSubmit(inputCode);
         handleSetData({
             question: inputCode
@@ -216,7 +214,7 @@ function Chat() {
     const clearInput = () => {
         setInputCode('');
     };
-    console.log(123, apiKey);
+
     return (
         <>
             <Head>

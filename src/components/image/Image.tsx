@@ -21,7 +21,6 @@ function parseAssetPrefix(image: string) {
 
 export function Image(props: ChakraNextImageProps) {
     const { src, alt, nextProps = {}, ...rest } = props;
-
     const imageUrl =
         typeof src === 'string' ? src : ((src as any)?.src as string);
     return (
