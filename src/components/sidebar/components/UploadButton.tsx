@@ -10,6 +10,7 @@ import {
     ModalCloseButton,
     Icon,
     useToast,
+    Tooltip
 } from '@chakra-ui/react';
 import { MdFileUpload } from 'react-icons/md';
 import axios from 'axios';
@@ -71,65 +72,67 @@ const UploadButton: React.FC = () => {
         }
     };
 
-    const handleEmbeddingFile = async () => {
-        if (selectedFile) {
-            const formData = new FormData();
-            formData.append('file', selectedFile);
+    // const handleEmbeddingFile = async () => {
+    //     if (selectedFile) {
+    //         const formData = new FormData();
+    //         formData.append('file', selectedFile);
 
-            try {
-                const response = await axios.post(`${process.env.API_URL}/embedding-file`, formData);
-                const { status, data } = response;
-                if (status === 200) {
-                    toast({
-                        title: 'File embedded successfully.',
-                        description: `File path: ${data.file_path}`, // Hiển thị đường dẫn file đã upload từ server
-                        status: 'success',
-                        duration: 2000,
-                        isClosable: true,
-                        position: 'top-right'
-                    });
-                } else {
-                    toast({
-                        title: 'An error occurred. Please try again later.',
-                        status: 'error',
-                        duration: 2000,
-                        isClosable: true,
-                        position: 'top-right'
-                    });
-                }
-            } catch (error) {
-                const errMsg = (error as any).response?.data.error;
-                toast({
-                    title: errMsg || 'An error occurred. Please try again later.',
-                    status: 'error',
-                    duration: 2000,
-                    isClosable: true,
-                    position: 'top-right'
-                });
-            }
-        }
-    };
+    //         try {
+    //             const response = await axios.post(`${process.env.API_URL}/embedding-file`, formData);
+    //             const { status, data } = response;
+    //             if (status === 200) {
+    //                 toast({
+    //                     title: 'File embedded successfully.',
+    //                     description: `File path: ${data.file_path}`, // Hiển thị đường dẫn file đã upload từ server
+    //                     status: 'success',
+    //                     duration: 2000,
+    //                     isClosable: true,
+    //                     position: 'top-right'
+    //                 });
+    //             } else {
+    //                 toast({
+    //                     title: 'An error occurred. Please try again later.',
+    //                     status: 'error',
+    //                     duration: 2000,
+    //                     isClosable: true,
+    //                     position: 'top-right'
+    //                 });
+    //             }
+    //         } catch (error) {
+    //             const errMsg = (error as any).response?.data.error;
+    //             toast({
+    //                 title: errMsg || 'An error occurred. Please try again later.',
+    //                 status: 'error',
+    //                 duration: 2000,
+    //                 isClosable: true,
+    //                 position: 'top-right'
+    //             });
+    //         }
+    //     }
+    // };
 
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Button
-                    variant="primary"
-                    py="20px"
-                    px="50px" /* Đổi giá trị px để nút dài ra */
-                    fontSize="sm"
-                    borderRadius="5px"
-                    _hover={{
-                        boxShadow: '0px 21px 27px -10px rgba(96, 60, 255, 0.48) !important',
-                        bg: 'linear-gradient(15.46deg, #4A25E1 26.3%, #7B5AFF 86.4%) !important',
-                        _disabled: {
-                            bg: 'linear-gradient(15.46deg, #4A25E1 26.3%, #7B5AFF 86.4%)',
-                        },
-                    }}
-                    onClick={handleUploadClick}
-                >
-                    <Icon as={MdFileUpload} width="20px" height="20px" color="inherit" />
-                </Button>
+                <Tooltip label="Upload file to embed">
+                    <Button
+                        variant="primary"
+                        py="20px"
+                        px="50px" /* Đổi giá trị px để nút dài ra */
+                        fontSize="sm"
+                        borderRadius="5px"
+                        _hover={{
+                            boxShadow: '0px 21px 27px -10px rgba(96, 60, 255, 0.48) !important',
+                            bg: 'linear-gradient(15.46deg, #4A25E1 26.3%, #7B5AFF 86.4%) !important',
+                            _disabled: {
+                                bg: 'linear-gradient(15.46deg, #4A25E1 26.3%, #7B5AFF 86.4%)'
+                            }
+                        }}
+                        onClick={handleUploadClick}
+                    >
+                        <Icon as={MdFileUpload} width="20px" height="20px" color="inherit" />
+                    </Button>
+                </Tooltip>
             </div>
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <ModalOverlay />
@@ -140,11 +143,7 @@ const UploadButton: React.FC = () => {
                         <input type="file" accept=".pdf,.txt" onChange={handleFileChange} />
                     </ModalBody>
                     <ModalFooter>
-                        <Button
-                            colorScheme="blue"
-                            mr={3}
-                            onClick={() => setIsModalOpen(false)}
-                        >
+                        <Button colorScheme="blue" mr={3} onClick={() => setIsModalOpen(false)}>
                             Cancel
                         </Button>
                         <Button colorScheme="green" onClick={handleUploadFile}>

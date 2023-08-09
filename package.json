@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "test": "next dev -p 9797",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -22,6 +23,7 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "@types/react-router-dom": "^5.3.3",
     "@uiw/codemirror-theme-tokyo-night": "^4.19.11",
     "@uiw/react-codemirror": "^4.19.11",
     "axios": "^1.4.0",
@@ -33,6 +35,7 @@
     "endent": "^2.1.0",
     "eventsource-parser": "^1.0.0",
     "framer-motion": "^4.1.17",
+    "js-cookie": "^3.0.5",
     "next": "13.2.4",
     "react": "18.2.0",
     "react-build-sitemap": "^0.2.2",
@@ -44,10 +47,12 @@
     "react-router-dom": "^5.3.0",
     "react-scripts": "5.0.0",
     "remark-gfm": "^3.0.1",
+    "swr": "^2.2.0",
     "typescript": "4.9.5",
     "web-vitals": "^1.1.2"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.3",
     "@types/node": "18.15.11",
     "@types/react": "18.0.31",
     "@types/react-dom": "18.0.11",

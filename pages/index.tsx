@@ -1,34 +1,52 @@
 'use client';
 /*eslint-disable*/
-
+import Footer from '@/components/footer/FooterAdmin';
 import Link from '@/components/link/Link';
 import MessageBoxChat from '@/components/MessageBox';
-import { ChatBody, OpenAIModel } from '@/types/types';
-import { Button, Flex, Icon, Img, Input, Text, Tooltip, useColorModeValue } from '@chakra-ui/react';
-import { memo, useState } from 'react';
-import { MdAutoAwesome, MdEdit, MdPerson, MdSend } from 'react-icons/md';
-import Bg from '../public/img/chat/bg-image.png';
+import Sidebar from '@/components/sidebar/Sidebar';
+import routes from '@/routes';
+import { OpenAIModel } from '@/types/types';
+import { getActiveNavbar, getActiveRoute } from '@/utils/navigation';
+import {
+    Box,
+    Button,
+    Flex,
+    Icon,
+    Img,
+    Input,
+    Portal,
+    Text,
+    Tooltip,
+    useColorModeValue,
+    useDisclosure
+} from '@chakra-ui/react';
 import axios from 'axios';
 import Head from 'next/head';
+import { usePathname } from 'next/navigation';
+import { memo, useEffect, useState } from 'react';
+import { MdAutoAwesome, MdEdit, MdPerson, MdSend } from 'react-icons/md';
+import Bg from '../public/img/chat/bg-image.png';
+import Navbar from '@/components/navbar/NavbarAdmin';
+import withAuth from '@/components/PrivateRoute';
 
-const BoxItem = memo(({ question, answer }: { question: string; answer: string; }) => {
+const BoxItem = memo(({ question, answer }: { question: string; answer: string }) => {
     const borderColor = useColorModeValue('gray.200', 'whiteAlpha.200');
     const brandColor = useColorModeValue('brand.500', 'white');
     const gray = useColorModeValue('gray.500', 'white');
     const textColor = useColorModeValue('navy.700', 'white');
 
-    const isDisplay = (question && question !== '') && (answer && answer !== '');
+    const isDisplay = question && question !== '' && answer && answer !== '';
     console.log('BoxItem', question, answer);
 
     return (
         <Flex
-            className='box-item'
+            className="box-item"
             direction="column"
             w="100%"
             mx="auto"
             display={isDisplay ? 'flex' : 'none'}
             mb="50px"
-        // mb={'auto'}
+            // mb={'auto'}
         >
             {/* Question */}
             <Flex w="100%" align={'center'} mb="10px">
@@ -80,9 +98,12 @@ const BoxItem = memo(({ question, answer }: { question: string; answer: string; 
     );
 });
 
-export default function Chat(props: { apiKeyApp: string; }) {
+function Chat() {
     // *** If you use .env.local variable for your API key, method which we recommend, use the apiKey variable commented below
-    const { apiKeyApp } = props;
+    const pathname = usePathname();
+    const [apiKey, setApiKey] = useState('');
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
     // Input States
     const [inputOnSubmit, setInputOnSubmit] = useState<string>('');
     const [inputCode, setInputCode] = useState<string>('');
@@ -109,6 +130,13 @@ export default function Chat(props: { apiKeyApp: string; }) {
     const textColor = useColorModeValue('navy.700', 'white');
     const placeholderColor = useColorModeValue({ color: 'gray.500' }, { color: 'whiteAlpha.600' });
 
+    useEffect(() => {
+        const initialKey = localStorage.getItem('apiKey');
+        if (initialKey?.includes('sk-') && apiKey !== initialKey) {
+            setApiKey(initialKey);
+        }
+    }, [apiKey]);
+
     // Append pair question-answer
     const handleSetData = (res: any) => {
         setData((prev) => {
@@ -122,69 +150,6 @@ export default function Chat(props: { apiKeyApp: string; }) {
             return newData;
         });
     };
-
-    // const handleSetData = (res: any) => {
-    //     const question = res.question ? res.question : '';
-    //     const answer = res.answer ? res.answer : '';
-
-    //     // Find the index of the question in the data array
-    //     const questionIndex = data.findIndex((item) => item.question === question);
-
-    //     if (questionIndex !== -1) {
-    //         // If the question already exists in the data array, update its answer
-    //         setData((prevData) =>
-    //             prevData.map((item, index) => (index === questionIndex ? { ...item, answer } : item))
-    //         );
-    //     } else {
-    //         // If the question does not exist in the data array, add it with the answer
-    //         setData((prevData) => [...prevData, { question, answer }]);
-    //     }
-    // };
-
-    // const handleTranslate = async () => {
-    //     const apiKey = apiKeyApp;
-
-    //     setInputOnSubmit(inputCode);
-
-    //     // Chat post conditions(maximum number of characters, valid message etc.)
-    //     const maxCodeLength = model === 'gpt-3.5-turbo' ? 700 : 700;
-
-    //     if (!apiKeyApp?.includes('sk-') && !apiKey?.includes('sk-')) {
-    //         alert('Please enter an API key.');
-    //         return;
-    //     }
-
-    //     if (!inputCode) {
-    //         alert('Please enter your message.');
-    //         return;
-    //     }
-
-    //     if (inputCode.length > maxCodeLength) {
-    //         alert(
-    //             `Please enter code less than ${maxCodeLength} characters. You are currently at ${inputCode.length} characters.`
-    //         );
-    //         return;
-    //     }
-
-    //     setLoading(true);
-
-    //     try {
-    //         const response = await axios.post(`${process.env.API_URL}/process`, {
-    //             question: inputCode,
-    //             file_path: 'uploads/phuhung.txt',
-    //             api_key: localStorage.getItem('apiKey')
-    //         });
-
-    //         const { answer } = response.data;
-    //         // alert(answer);
-    //         setOutputCode(answer);
-    //         setInputCode('');
-    //         setLoading(false);
-    //     } catch (error) {
-    //         alert(error);
-    //         console.error(error);
-    //     }
-    // };
 
     const handleTranslate = async () => {
         const apiKey = apiKeyApp;
@@ -258,46 +223,88 @@ export default function Chat(props: { apiKeyApp: string; }) {
             <Head>
                 <title>Question Answering System</title>
             </Head>
-            <Flex w="100%" pt={{ base: '70px', md: '0px' }} direction="column" position="relative">
-                <Img src={Bg.src} position={'absolute'} w="0px" left="50%" top="50%" transform={'translate(-50%, -50%)'} />
-                <Flex
-                    direction="column"
-                    mx="auto"
-                    w={{ base: '100%', md: '100%', xl: '100%' }}
-                    minH={{ base: '75vh', '2xl': '85vh' }}
-                    maxW="1000px"
+            <Box>
+                <Sidebar setApiKey={setApiKey} routes={routes} />
+                <Box
+                    pt={{ base: '60px', md: '100px' }}
+                    float="right"
+                    minHeight="100vh"
+                    height="100%"
+                    overflow="auto"
+                    position="relative"
+                    maxHeight="100%"
+                    w={{ base: '100%', xl: 'calc( 100% - 290px )' }}
+                    maxWidth={{ base: '100%', xl: 'calc( 100% - 290px )' }}
+                    transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
+                    transitionDuration=".2s, .2s, .35s"
+                    transitionProperty="top, bottom, width"
+                    transitionTimingFunction="linear, linear, ease"
                 >
-                    {/* <Flex direction={'column'} w="100%" mb={outputCode ? '20px' : 'auto'}>
-                    <Flex mx="auto" zIndex="2" w="max-content" mb="20px" borderRadius="60px"></Flex>
-                </Flex> */}
+                    <Portal>
+                        <Box>
+                            <Navbar
+                                setApiKey={setApiKey}
+                                onOpen={onOpen}
+                                logoText={'Question Answering System'}
+                                brandText={getActiveRoute(routes, pathname)}
+                                secondary={getActiveNavbar(routes, pathname)}
+                            />
+                        </Box>
+                    </Portal>
+                    <Box mx="auto" display="flex" p={{ base: '20px', md: '30px' }} pe="20px" minH="100vh" pt="50px">
+                        <Flex w="100%" pt={{ base: '70px', md: '0px' }} direction="column" position="relative">
+                            <Img
+                                src={Bg.src}
+                                position={'absolute'}
+                                w="0px"
+                                left="50%"
+                                top="50%"
+                                transform={'translate(-50%, -50%)'}
+                            />
+                            <Flex
+                                direction="column"
+                                mx="auto"
+                                w={{ base: '100%', md: '100%', xl: '100%' }}
+                                minH={{ base: '75vh', '2xl': '85vh' }}
+                                maxW="1000px"
+                            >
+                                {/* 
+                                    <Flex direction={'column'} w="100%" mb={outputCode ? '20px' : 'auto'}>
+                                        <Flex mx="auto" zIndex="2" w="max-content" mb="20px" borderRadius="60px"></Flex>
+                                    </Flex> 
+                                */}
 
-                    {/* Main Box */}
-                    {data.length > 0 &&
-                        data.map((item: any, index) => (
-                            <BoxItem key={index + `${item.question}`} question={item.question} answer={item.answer} />
-                        ))}
+                                {/* Main Box */}
+                                {data.length > 0 &&
+                                    data.map((item: any, index) => (
+                                        <BoxItem
+                                            key={index + `${item.question}`}
+                                            question={item.question}
+                                            answer={item.answer}
+                                        />
+                                    ))}
 
-                    {/* Chat Input */}
-                    <Flex ms={{ base: '0px', xl: '60px' }} mt="auto" justifySelf={'flex-end'}>
-                        <Input
-                            minH="54px"
-                            h="100%"
-                            border="1px solid"
-                            borderColor={borderColor}
-                            borderRadius="45px"
-                            p="15px 20px"
-                            me="10px"
-                            fontSize="sm"
-                            fontWeight="500"
-                            _focus={{ borderColor: 'none' }}
-                            color={inputColor}
-                            _placeholder={placeholderColor}
-                            placeholder="Type your message here..."
-                            value={inputCode}
-                            onChange={handleChange}
-                            onKeyDown={handleKeyDown}
-                        />
-                        {/* <Button
+                                {/* Chat Input */}
+                                <Flex ms={{ base: '0px', xl: '60px' }} mt="auto" justifySelf={'flex-end'}>
+                                    <Input
+                                        minH="54px"
+                                        h="100%"
+                                        border="1px solid"
+                                        borderColor={borderColor}
+                                        borderRadius="45px"
+                                        p="15px 20px"
+                                        me="10px"
+                                        fontSize="sm"
+                                        fontWeight="500"
+                                        _focus={{ borderColor: 'none' }}
+                                        color={inputColor}
+                                        _placeholder={placeholderColor}
+                                        placeholder="Type your message here..."
+                                        value={inputCode}
+                                        onChange={handleChange}
+                                        onKeyDown={handleKeyDown}
+                                    />
+                                    {/* <Button
                         variant="primary"
                         py="20px"
                         px="16px"
@@ -318,33 +325,53 @@ export default function Chat(props: { apiKeyApp: string; }) {
                     >
                         Ask
                     </Button> */}
-                        <Tooltip label="Send a message">
-                            <Button py="20px"
-                                fontSize="sm"
-                                ms="auto"
-                                _hover={{ backgroundColor: "transparent", boxShadow: "none" }}
-                                _active={{ backgroundColor: "transparent", boxShadow: "none" }}
-                                h="54px" onClick={handleTranslate} disabled={loading ? true : false}>
-                                <Icon as={MdSend} width="20px" height="20px" color={brandColor} />
-                            </Button>
-                        </Tooltip>
+                                    <Tooltip label="Send a message">
+                                        <Button
+                                            py="20px"
+                                            fontSize="sm"
+                                            ms="auto"
+                                            _hover={{ backgroundColor: 'transparent', boxShadow: 'none' }}
+                                            _active={{ backgroundColor: 'transparent', boxShadow: 'none' }}
+                                            h="54px"
+                                            onClick={handleTranslate}
+                                            disabled={loading ? true : false}
+                                        >
+                                            <Icon as={MdSend} width="20px" height="20px" color={brandColor} />
+                                        </Button>
+                                    </Tooltip>
+                                </Flex>
 
-                    </Flex>
-
-                    <Flex justify="center" mt="20px" direction={{ base: 'column', md: 'row' }} alignItems="center">
-                        <Text fontSize="xs" textAlign="center" color={gray}>
-                            Free Research Preview. ChatGPT may produce inaccurate information about people, places, or
-                            facts.
-                        </Text>
-                        <Link href="https://help.openai.com/en/articles/6825453-chatgpt-release-notes">
-                            <Text fontSize="xs" color={textColor} fontWeight="500" textDecoration="underline">
-                                ChatGPT May 12 Version
-                            </Text>
-                        </Link>
-                    </Flex>
-                </Flex>
-            </Flex>
+                                <Flex
+                                    justify="center"
+                                    mt="20px"
+                                    direction={{ base: 'column', md: 'row' }}
+                                    alignItems="center"
+                                >
+                                    <Text fontSize="xs" textAlign="center" color={gray}>
+                                        Free Research Preview. ChatGPT may produce inaccurate information about people,
+                                        places, or facts.
+                                    </Text>
+                                    <Link href="https://help.openai.com/en/articles/6825453-chatgpt-release-notes">
+                                        <Text
+                                            fontSize="xs"
+                                            color={textColor}
+                                            fontWeight="500"
+                                            textDecoration="underline"
+                                        >
+                                            ChatGPT May 12 Version
+                                        </Text>
+                                    </Link>
+                                </Flex>
+                            </Flex>
+                        </Flex>
+                    </Box>
+                    <Box>
+                        <Footer />
+                    </Box>
+                </Box>
+            </Box>
         </>
-
     );
 }
+
+export default withAuth(Chat);
