@@ -101,7 +101,7 @@ const BoxItem = memo(({ question, answer }: { question: string; answer: string }
 function Chat() {
     // *** If you use .env.local variable for your API key, method which we recommend, use the apiKey variable commented below
     const pathname = usePathname();
-    const [apiKey, setApiKey] = useState('');
+    const [apiKey, setApiKey] = useState<string>('');
     const { isOpen, onOpen, onClose } = useDisclosure();
 
     // Input States
@@ -118,7 +118,6 @@ function Chat() {
     const [data, setData] = useState<any[]>([]);
 
     // API Key
-    // const [apiKey, setApiKey] = useState<string>(apiKeyApp);
     const borderColor = useColorModeValue('gray.200', 'whiteAlpha.200');
     const inputColor = useColorModeValue('navy.700', 'white');
     const iconColor = useColorModeValue('brand.500', 'white');
@@ -152,7 +151,7 @@ function Chat() {
     };
 
     const handleTranslate = async () => {
-        const apiKey = apiKeyApp;
+        const apiKey = apiKey;
 
         // setInputOnSubmit(inputCode);
         handleSetData({
@@ -162,7 +161,7 @@ function Chat() {
         // Chat post conditions(maximum number of characters, valid message etc.)
         const maxCodeLength = model === 'gpt-3.5-turbo' ? 700 : 700;
 
-        if (!apiKeyApp?.includes('sk-') && !apiKey?.includes('sk-')) {
+        if (!apiKey?.includes('sk-') && !apiKey?.includes('sk-')) {
             alert('Please enter an API key.');
             return;
         }
@@ -217,7 +216,7 @@ function Chat() {
     const clearInput = () => {
         setInputCode('');
     };
-
+    console.log(123, apiKey);
     return (
         <>
             <Head>

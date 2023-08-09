@@ -2,10 +2,19 @@
 import { AppContextType, useAppContext } from '@/contexts/AppContext';
 import { useRouter } from 'next/router';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 
 export default function AuthPage() {
-    const router = useRouter();
     const { isLoggedIn, setIsLoggedIn } = useAppContext();
+    const history = useHistory();
+
+    // Navigate to dashboard if logged in
+    useEffect(() => {
+        if (history && isLoggedIn) {
+            history.push('/');
+        }
+    }, [history, isLoggedIn]);
 
     // Handle login logic
     const handleLogin = () => {
@@ -14,12 +23,6 @@ export default function AuthPage() {
         // Set isLoggedIn to true upon successful login
         setIsLoggedIn(true);
     };
-
-    if (isLoggedIn) {
-        // Redirect to dashboard if already logged in
-        router.push('/'); // Redirect to dashboard or any other page
-        return null;
-    }
 
     // Render your login form
     return (
