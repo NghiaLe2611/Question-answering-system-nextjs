@@ -1,67 +1,42 @@
-// // 'use client'
-// import { useAppContext } from '@/contexts/AppContext';
-// import { useRouter } from 'next/router';
-// import { useEffect } from 'react';
-// import { useHistory } from 'react-router-dom';
-// import { NextComponentType } from "next";
-
-// // Handle authenticated pages
-// const withAuth = (WrappedComponent: NextComponentType) => {
-//     const WrappedWithAuth: React.FC = (props: any) => {
-//         // const history = useHistory();
-//         const { user } = useAppContext();
-//         const router = useRouter();
-
-//         useEffect(() => {
-//             if (!user) {
-//                 router.push('/auth');
-//             }
-//         }, [user, router]);
-
-//         return <WrappedComponent {...props} />;
-//     };
-
-//     WrappedWithAuth.displayName = `withAuth(${WrappedComponent.displayName || WrappedComponent.name})`;
-
-//     // if (WrappedComponent.getInitialProps) {
-//     //     withAuth.getInitialProps = WrappedComponent.getInitialProps;
-//     // }
-//     return WrappedWithAuth;
-// };
-
-
-// export default withAuth;
-
 import { useEffect, useState } from 'react';
 import Router from 'next/router';
 import { useAppContext } from '@/contexts/AppContext';
 import { Box, Spinner } from '@chakra-ui/react';
 import { useHistory } from 'react-router-dom';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+
+
+async function getInitialProps(ctx: any) {
+    console.log(222, ctx);
+
+    return {};
+}
 
 const withAuth = (WrappedComponent: any) => {
-    const WithAuth = (props: any) => {
-        const { user, loading } = useAppContext();
-        const history = useHistory();
-
-        useEffect(() => {
-            if (!user) {
-                if (!loading) {
-                    Router.push('auth');
-                }
-            }
-        }, [user, loading, history]);
-
-        console.log(user, loading);
+    const WithAuth = ({ ...props }: any) => {
         return <WrappedComponent {...props} />;
     };
 
-    // WithAuth.getInitialProps = async (ctx: any) => {
-    //     const wrappedComponentInitialProps = WrappedComponent.getInitialProps
-    //         ? await WrappedComponent.getInitialProps(ctx)
-    //         : {};
+    WithAuth.getInitialProps = async (ctx: any) => {
+        // const isAuthenticated = ctx.req.cookies ? true : false;
+        const isAuthenticated = false;
+        if (!isAuthenticated) {
+            if (ctx.res) {
+                ctx.res.writeHead(307, { Location: '/auth' });
+                ctx.res.end();
+            }
 
-    //     return { ...wrappedComponentInitialProps };
-    // };
+            // Return an empty object,
+            // otherwise Next.js will throw an error
+            return {};
+        }
+
+        return {
+            props: {
+                isAuthenticated
+            }
+        };
+    };
 
     return WithAuth;
 };

@@ -4,16 +4,15 @@ import { useAppContext } from '@/contexts/AppContext';
 import { login } from '@/firebase/service';
 import { Box, Button, FormControl, FormErrorMessage, FormLabel, Heading, Input, Stack } from '@chakra-ui/react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router-dom';
-import { useRouter } from 'next/router';
-import withAuth from '@/components/PrivateRoute';
 
 type LoginPayload = {
     username: string;
     password: string;
-  };
+};
 
 const LoginForm = () => {
     const {
@@ -21,12 +20,28 @@ const LoginForm = () => {
         register,
         formState: { errors, isSubmitting },
     } = useForm<LoginPayload>();
+    const history = useHistory();
+    const router = useRouter();
+    const { userInfo } = useAppContext();
+    
 
+    useEffect(() => {
+        if (userInfo) {
+            // router.push('/');
+            window.location.href = '/';
+        }
+    }, [userInfo]);
+
+
+    // Login with Google username, password
     const handleLogin: SubmitHandler<LoginPayload> = async (values) => {
         const { username, password } = values;
+
         try {
             const { result, error } = await login(username, password);
-            console.log('handleLogin', result, error);
+            if (error) {
+                alert((error as any).code);
+            }
         } catch (error) {
             console.log(error);
         }
@@ -86,20 +101,7 @@ const LoginForm = () => {
     );
 };
 
-function AuthPage() {
-    const { user } = useAppContext();
-    const history = useHistory();
-    const router = useRouter();
-    
-    // Navigate to dashboard if logged in
-    useEffect(() => {
-        if (router && user) {
-            // history.push('/');
-            router.push('/');
-        }
-
-    }, [router, user]);
-
+function AuthPage(props: any) {
     return (
         <div>
             <Head>
@@ -116,3 +118,21 @@ function AuthPage() {
 }
 
 export default AuthPage;
+
+// Use getServerSideProps for server-side rendering
+
+export const getServerSideProps = async (ctx: any) => {
+    const isAuthenticated = ctx.req && ctx.req.cookies.token ? true : false;
+    if (isAuthenticated) {
+        return {
+            redirect: {
+                destination: '/',
+                permanent: false,
+            },
+        };
+    }
+
+    return {
+        props: { isAuthenticated },
+    };
+};

@@ -3,6 +3,7 @@
 import Footer from '@/components/footer/FooterAdmin';
 import Link from '@/components/link/Link';
 import MessageBoxChat from '@/components/MessageBox';
+import Navbar from '@/components/navbar/NavbarAdmin';
 import Sidebar from '@/components/sidebar/Sidebar';
 import routes from '@/routes';
 import { OpenAIModel } from '@/types/types';
@@ -26,10 +27,8 @@ import { usePathname } from 'next/navigation';
 import { memo, useEffect, useState } from 'react';
 import { MdAutoAwesome, MdEdit, MdPerson, MdSend } from 'react-icons/md';
 import Bg from '../public/img/chat/bg-image.png';
-import Navbar from '@/components/navbar/NavbarAdmin';
-import withAuth from '@/components/PrivateRoute';
 
-const BoxItem = memo(({ question, answer }: { question: string; answer: string }) => {
+const BoxItem = memo(({ question, answer }: { question: string; answer: string; }) => {
     const borderColor = useColorModeValue('gray.200', 'whiteAlpha.200');
     const brandColor = useColorModeValue('brand.500', 'white');
     const gray = useColorModeValue('gray.500', 'white');
@@ -46,7 +45,7 @@ const BoxItem = memo(({ question, answer }: { question: string; answer: string }
             mx="auto"
             display={isDisplay ? 'flex' : 'none'}
             mb="50px"
-            // mb={'auto'}
+        // mb={'auto'}
         >
             {/* Question */}
             <Flex w="100%" align={'center'} mb="10px">
@@ -98,11 +97,13 @@ const BoxItem = memo(({ question, answer }: { question: string; answer: string }
     );
 });
 
-function Chat() {
+function Chat(props: any) {
     // *** If you use .env.local variable for your API key, method which we recommend, use the apiKey variable commented below
     const pathname = usePathname();
     const [apiKey, setApiKey] = useState<string>('');
     const { isOpen, onOpen, onClose } = useDisclosure();
+
+    const { isAuthenticated } = props.props || false;
 
     // Input States
     const [inputOnSubmit, setInputOnSubmit] = useState<string>('');
@@ -371,4 +372,21 @@ function Chat() {
     );
 }
 
-export default withAuth(Chat);
+// export default withAuth(Chat);
+export default Chat;
+
+export const getServerSideProps = async (ctx: any) => {
+    const isAuthenticated = ctx.req && ctx.req.cookies.token ? true : false;
+    if (!isAuthenticated) {
+        return {
+            redirect: {
+                destination: '/auth',
+                permanent: false,
+            },
+        };
+    }
+
+    return {
+        props: { isAuthenticated },
+    };
+};

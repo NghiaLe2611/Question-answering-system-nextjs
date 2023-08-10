@@ -3,6 +3,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import Image from 'next/image';
 import googleBtn from '../../public/img/google-btn.png';
 
+// Enable Authenticate sign-in provider Google in console Firebase
 const GoogleSignInButton = () => {
     const auth = getAuth(firebaseApp);
 

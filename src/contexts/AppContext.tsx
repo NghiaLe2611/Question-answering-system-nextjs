@@ -1,11 +1,13 @@
 
 import firebaseApp from '@/firebase/config';
 import { logOut } from '@/firebase/service';
+import { decodeString, setCookie } from '@/jwt/service';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 
 export interface AppContextType {
-    user: any;
+    userInfo: any;
     loading?: boolean;
 }
 
@@ -25,61 +27,57 @@ export const useAppContext = () => {
     return context;
 };
 
+
+const cookieToken = Cookies.get('token');
+
 export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const existedUser = localStorage.getItem('user');
-        if (existedUser) {
-            const parsedUser = JSON.parse(existedUser);
-           
+    const decodedToken = useMemo(() => {
+        if (cookieToken) {
+            return decodeString(cookieToken as string);
         }
+        return "";
     }, []);
-    // console.log('loading', loading);
+
+    const [userInfo, setUser] = useState<any>(null);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
+        // const cookieToken = Cookies.get('token');
+        const expStorage = localStorage.getItem('exp') ? Number(localStorage.getItem('exp')) : null;
 
-        const existedUser = localStorage.getItem('user');
-
-        if (existedUser) {
-            const parsedUser = JSON.parse(existedUser as any);
-            const lastLoginAt = parsedUser.lastLoginAt;
-            const now = Date.now();
-            const fiveMins = 5 * 60 * 1000;
-
-            if (now - lastLoginAt > fiveMins) {
-                // Log out if more than 5 mins
+        // Check timestamp now > expire time to handle logout
+        if (expStorage) {
+            if (new Date().getTime() > expStorage) {
                 logOut();
-            } else {
-                console.log('still login');
-                setUser(parsedUser);
-                setLoading(false);
             }
-
-            return;
         }
 
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            console.log('onAuthStateChanged', user);
-            // lastLoginAt, createdAt
-            if (user) {
-                const { accessToken, displayName, email, metadata, photoURL } = user as any;
-                const data = {
-                    displayName, email, photoURL, lastLoginAt: metadata.lastLoginAt
-                };
-                setUser(data as any);
-                setLoading(false);
-                localStorage.setItem('user', JSON.stringify(data));
+            if (!user) return;
 
-            } else {
-                setUser(null);
-                setLoading(false);
-                localStorage.removeItem('user');
+            const { accessToken, displayName, photoURL, email, metadata } = user as any;
+            console.log('onAuthStateChanged', user);
+            setUser({
+                displayName: displayName ? displayName : 'User', photoURL
+            });
+            setCookie('token', accessToken);
+
+            // Check expire time to log out
+            if (!expStorage) {
+                const expTime = new Date().getTime() + 5 * 60 * 1000; //5m
+                console.log(expTime);
+                localStorage.setItem('exp', expTime.toString());
             }
         });
 
-        return () => unsubscribe(); // clean up
+
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
     }, []);
 
-    return <AppContext.Provider value={{ user, loading }}>{children}</AppContext.Provider>;
+    return <AppContext.Provider value={{ userInfo }}>{children}</AppContext.Provider>;
 };
