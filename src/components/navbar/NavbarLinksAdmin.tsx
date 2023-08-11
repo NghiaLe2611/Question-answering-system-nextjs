@@ -28,9 +28,9 @@ import { NextAvatar } from '../image/Avatar';
 
 export default function HeaderLinks(props: {
     secondary: boolean;
-    setApiKey: any;
+    setApiKey?: any;
 }) {
-    const { secondary, setApiKey } = props;
+    const { secondary } = props;
     const { userInfo } = useAppContext();
 
     const { colorMode, toggleColorMode } = useColorMode();
@@ -76,7 +76,7 @@ export default function HeaderLinks(props: {
                 borderRadius="30px"
             />
             <SidebarResponsive routes={routes} />
-            <APIModal setApiKey={setApiKey} />
+            <APIModal />
 
             <Menu>
                 <MenuButton p="0px">
@@ -100,68 +100,6 @@ export default function HeaderLinks(props: {
                     minW={{ base: 'unset' }}
                     maxW={{ base: '360px', md: 'unset' }}
                 >
-                    {/* <Flex bgImage={navImage} borderRadius="16px" mb="28px" alt="" /> */}
-                    {/* <Flex flexDirection="column">
-            <Link
-              isExternal
-              w="100%"
-              href="https://horizon-ui.com/ai-template/"
-            >
-              <Button
-                variant="primary"
-                py="20px"
-                px="16px"
-                fontSize="sm"
-                borderRadius="45px"
-                mb="10px"
-                w="100%"
-                h="54px"
-              >
-                Buy Horizon AI Template
-              </Button>
-            </Link>
-            <Link
-              isExternal
-              w="100%"
-              href="https://horizon-ui.com/docs-ai-template/"
-            >
-              <Button
-                bg={buttonBg}
-                border="1px solid"
-                color={textColor}
-                mt={{ base: '20px', md: '0px' }}
-                borderColor={useColorModeValue('gray.200', 'whiteAlpha.100')}
-                fontSize="sm"
-                borderRadius="45px"
-                w="100%"
-                minW="44px"
-                h="44px"
-                _placeholder={{ color: 'gray.500' }}
-                _hover={hoverButton}
-                _active={activeButton}
-                _focus={activeButton}
-              >
-                See Documentation
-              </Button>
-            </Link>
-            <Link
-              w="100%"
-              isExternal
-              href="https://github.com/horizon-ui/chatgpt-ai-template"
-            >
-              <Button
-                w="100%"
-                h="44px"
-                variant="no-hover"
-                color={textColor}
-                fontSize="sm"
-                borderRadius="45px"
-                bg="transparent"
-              >
-                Try Free Version
-              </Button>
-            </Link>
-          </Flex> */}
                 </MenuList>
             </Menu>
 
@@ -186,8 +124,6 @@ export default function HeaderLinks(props: {
             <Menu>
                 {
                     userInfo?.photoURL ? (
-                        // 
-                        // <NextAvatar h="34px" w="34px" src={avatar4} me="10px" />
                         <MenuButton p="0px" style={{ position: 'relative' }}>
                             <NextAvatar h="35px" w="35px" src={userInfo.photoURL} me="10px" />
                         </MenuButton>

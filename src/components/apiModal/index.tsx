@@ -28,11 +28,12 @@ import {
 import { useState } from 'react';
 import { MdLock } from 'react-icons/md';
 import axios from 'axios';
+import { useAppContext } from '@/contexts/AppContext';
 
-function APIModal(props: { setApiKey: any; sidebar?: boolean }) {
+function APIModal(props: { setApiKey?: any; sidebar?: boolean }) {
     const localStorageApiKey = typeof window !== 'undefined' ? localStorage.getItem('apiKey') : null;
-
-    const { setApiKey, sidebar } = props;
+    const { setApiKey } = useAppContext();
+    const { sidebar } = props;
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [inputCode, setInputCode] = useState<string>(localStorageApiKey ? localStorageApiKey : '');
 
@@ -49,7 +50,7 @@ function APIModal(props: { setApiKey: any; sidebar?: boolean }) {
     };
 
     const handleApiKeyChange = (value: string) => {
-        // setApiKey(value);
+        setApiKey(value); // set api key to context
         axios.post(`${process.env.API_URL}/api-key`, { apiKey: value }).then((response) => {
             // '/api-key'
             if (response.status === 200) {
@@ -151,23 +152,6 @@ function APIModal(props: { setApiKey: any; sidebar?: boolean }) {
                                     h="54px"
                                     onClick={() => {
                                         inputCode?.includes('sk-') ? handleApiKeyChange(inputCode) : null;
-                                        // if (inputCode)
-                                        //     toast({
-                                        //         title: inputCode?.includes('sk-')
-                                        //             ? `Success! You have successfully added your API key!`
-                                        //             : !inputCode?.includes('sk-')
-                                        //                 ? `Invalid API key. Please make sure your API key is still working properly.`
-                                        //                 : 'Please add your API key!',
-                                        //         position: 'top',
-                                        //         status: inputCode?.includes('sk-')
-                                        //             ? 'success'
-                                        //             : !inputCode?.includes('sk-')
-                                        //                 ? `error`
-                                        //                 : !inputCode
-                                        //                     ? 'warning'
-                                        //                     : 'error',
-                                        //         isClosable: true,
-                                        //     });
                                     }}
                                 >
                                     Save API Key

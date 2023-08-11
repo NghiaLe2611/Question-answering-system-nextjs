@@ -75,7 +75,7 @@ function SidebarContent(props: SidebarContent) {
             <Box mt="60px" width={'100%'} display={'flex'} justifyContent={'center'}>
                 <SidebarCard />
             </Box>
-            <APIModal setApiKey={setApiKey} sidebar={true} />
+            <APIModal sidebar={true} />
 
             <Flex
                 mt="8px"

@@ -6,7 +6,7 @@ export const expireTime = 5; // 5m
 
 // Encode access token with secretKey to increase security
 export const encodeString = (input: string) => {
-    const encoded = CryptoJS.AES.encrypt(input, secretKey).toString();
+    const encoded = CryptoJS.AES.encrypt(JSON.stringify(input), secretKey).toString();
     return encoded;
 };
 

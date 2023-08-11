@@ -9,6 +9,8 @@ import { createContext, ReactNode, useContext, useEffect, useMemo, useState } fr
 export interface AppContextType {
     userInfo: any;
     loading?: boolean;
+    apiKey?: string;
+    setApiKey?: any;
 }
 
 type AppContextProviderProps = {
@@ -28,19 +30,22 @@ export const useAppContext = () => {
 };
 
 
-const cookieToken = Cookies.get('token');
+// const cookieToken = Cookies.get('token');
 
 export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children }) => {
 
-    const decodedToken = useMemo(() => {
-        if (cookieToken) {
-            return decodeString(cookieToken as string);
-        }
-        return "";
-    }, []);
+    // const decodedToken = useMemo(() => {
+    //     if (cookieToken) {
+    //         return decodeString(cookieToken as string);
+    //     }
+    //     return "";
+    // }, []);
 
     const [userInfo, setUser] = useState<any>(null);
+    const [apiKey, setApiKey] = useState('');
     const [loading, setLoading] = useState(false);
+
+    console.log('apiKey', apiKey);
 
     useEffect(() => {
         // const cookieToken = Cookies.get('token');
@@ -79,5 +84,16 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
         };
     }, []);
 
-    return <AppContext.Provider value={{ userInfo }}>{children}</AppContext.Provider>;
+    useEffect(() => {
+        const initialKey = localStorage.getItem('apiKey');
+        if (initialKey?.includes('sk-') && apiKey !== initialKey) {
+            setApiKey(initialKey);
+        }
+    }, [apiKey]);
+
+    const handleSetApiKey = (val: string) => {
+        setApiKey(val);
+    }
+
+    return <AppContext.Provider value={{ userInfo, apiKey, setApiKey: handleSetApiKey }}>{children}</AppContext.Provider>;
 };

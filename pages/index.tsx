@@ -5,6 +5,7 @@ import Link from '@/components/link/Link';
 import MessageBoxChat from '@/components/MessageBox';
 import Navbar from '@/components/navbar/NavbarAdmin';
 import Sidebar from '@/components/sidebar/Sidebar';
+import { useAppContext } from '@/contexts/AppContext';
 import routes from '@/routes';
 import { OpenAIModel } from '@/types/types';
 import { getActiveNavbar, getActiveRoute } from '@/utils/navigation';
@@ -98,23 +99,18 @@ const BoxItem = memo(({ question, answer }: { question: string; answer: string; 
 });
 
 function Chat(props: any) {
+    const { apiKey } = useAppContext();
+    console.log(123, apiKey);
     // *** If you use .env.local variable for your API key, method which we recommend, use the apiKey variable commented below
     const pathname = usePathname();
-    const [apiKey, setApiKey] = useState<string>('');
-    const { isOpen, onOpen, onClose } = useDisclosure();
-
-    const { isAuthenticated } = props.props || false;
-
+    // const [apiKey, setApiKey] = useState<string>('');
+    const { onOpen } = useDisclosure();
     // Input States
-    const [inputOnSubmit, setInputOnSubmit] = useState<string>('');
     const [inputCode, setInputCode] = useState<string>('');
-    // Response message
-    const [outputCode, setOutputCode] = useState<string>('');
     // ChatGPT model
     const [model, setModel] = useState<OpenAIModel>('gpt-3.5-turbo');
     // Loading state
     const [loading, setLoading] = useState<boolean>(false);
-
     // List of question and answer
     const [data, setData] = useState<any[]>([]);
 
@@ -130,12 +126,12 @@ function Chat(props: any) {
     const textColor = useColorModeValue('navy.700', 'white');
     const placeholderColor = useColorModeValue({ color: 'gray.500' }, { color: 'whiteAlpha.600' });
 
-    useEffect(() => {
-        const initialKey = localStorage.getItem('apiKey');
-        if (initialKey?.includes('sk-') && apiKey !== initialKey) {
-            setApiKey(initialKey);
-        }
-    }, [apiKey]);
+    // useEffect(() => {
+    //     const initialKey = localStorage.getItem('apiKey');
+    //     if (initialKey?.includes('sk-') && apiKey !== initialKey) {
+    //         setApiKey(initialKey);
+    //     }
+    // }, [apiKey]);
 
     // Append pair question-answer
     const handleSetData = (res: any) => {
@@ -222,7 +218,7 @@ function Chat(props: any) {
                 <title>Question Answering System</title>
             </Head>
             <Box>
-                <Sidebar setApiKey={setApiKey} routes={routes} />
+                <Sidebar routes={routes} />
                 <Box
                     pt={{ base: '60px', md: '100px' }}
                     float="right"
@@ -241,7 +237,6 @@ function Chat(props: any) {
                     <Portal>
                         <Box>
                             <Navbar
-                                setApiKey={setApiKey}
                                 onOpen={onOpen}
                                 logoText={'Question Answering System'}
                                 brandText={getActiveRoute(routes, pathname)}
