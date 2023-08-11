@@ -1,13 +1,9 @@
 'use client';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
-import { useAppContext } from '@/contexts/AppContext';
 import { login } from '@/firebase/service';
 import { Box, Button, FormControl, FormErrorMessage, FormLabel, Heading, Input, Stack } from '@chakra-ui/react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
 
 type LoginPayload = {
     username: string;
@@ -19,19 +15,7 @@ const LoginForm = () => {
         handleSubmit,
         register,
         formState: { errors, isSubmitting },
-    } = useForm<LoginPayload>();
-    const history = useHistory();
-    const router = useRouter();
-    const { userInfo } = useAppContext();
-    
-
-    useEffect(() => {
-        if (userInfo) {
-            // router.push('/');
-            window.location.href = '/';
-        }
-    }, [userInfo]);
-
+    } = useForm<LoginPayload>();   
 
     // Login with Google username, password
     const handleLogin: SubmitHandler<LoginPayload> = async (values) => {
@@ -101,7 +85,7 @@ const LoginForm = () => {
     );
 };
 
-function AuthPage(props: any) {
+function AuthPage(props: any) { // isAuthenticated
     return (
         <div>
             <Head>
@@ -120,7 +104,6 @@ function AuthPage(props: any) {
 export default AuthPage;
 
 // Use getServerSideProps for server-side rendering
-
 export const getServerSideProps = async (ctx: any) => {
     const isAuthenticated = ctx.req && ctx.req.cookies.token ? true : false;
     if (isAuthenticated) {

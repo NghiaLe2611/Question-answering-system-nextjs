@@ -2,6 +2,7 @@ import CryptoJS from 'crypto-js';
 import Cookies from 'js-cookie';
 
 const secretKey = process.env.SECRECT_KEY as string;
+export const expireTime = 5; // 5m
 
 // Encode access token with secretKey to increase security
 export const encodeString = (input: string) => {
@@ -14,10 +15,10 @@ export const decodeString = (encoded: string) => {
     return decrypted;
 };
 
-export const setCookie = (name: string, token: string, mins: number = 5) => {
+export const setCookie = (name: string, token: string, mins: number = expireTime) => { // default in mins
     const encodedToken = encodeString(token);
     const expirationDate = new Date();
-    const expTime = expirationDate.getTime() + mins * 60 * 1000; // 1m
+    const expTime = expirationDate.getTime() + mins * 60 * 1000;
     expirationDate.setTime(expTime); 
     Cookies.set(name, encodedToken, { expires: expirationDate });
 }

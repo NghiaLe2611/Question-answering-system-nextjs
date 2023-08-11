@@ -1,7 +1,7 @@
 
 import firebaseApp from '@/firebase/config';
 import { logOut } from '@/firebase/service';
-import { decodeString, setCookie } from '@/jwt/service';
+import { decodeString, expireTime, setCookie } from '@/jwt/service';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Cookies from 'js-cookie';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
@@ -65,8 +65,8 @@ export const AppContextProvider: React.FC<AppContextProviderProps> = ({ children
 
             // Check expire time to log out
             if (!expStorage) {
-                const expTime = new Date().getTime() + 5 * 60 * 1000; //5m
-                console.log(expTime);
+                const expTime = new Date().getTime() + expireTime * 60 * 1000;
+                // console.log(expTime);
                 localStorage.setItem('exp', expTime.toString());
             }
         });
